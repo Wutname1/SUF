@@ -161,6 +161,14 @@ for k, v in next, {
 		return active and active[name]
 	end,
 
+	--[[ frame:IsEnabled()
+
+	Used to check if the given frame is enabled or not. This is a reference to `UnitWatchRegistered`.
+
+	* self - unit frame
+	--]]
+	IsEnabled = UnitWatchRegistered,
+
 	--[[ frame:Enable(asState)
 	Used to toggle the visibility of a unit frame based on the existence of its unit. This is a reference to
 	`RegisterUnitWatch`.
