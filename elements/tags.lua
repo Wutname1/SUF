@@ -531,7 +531,12 @@ local function createOnUpdate(timer)
 	end
 end
 
-local function onShow(self)
+--[[ Tags: frame:ForceUpdateTags()
+Used to forcefully update all tags on a frame.
+
+* self - the unit frame from which to update the tags
+--]]
+local function ForceUpdate(self)
 	for _, fs in next, self.__tags do
 		fs:UpdateTag()
 	end
@@ -594,7 +599,7 @@ local function Tag(self, fs, tagstr)
 
 	if(not self.__tags) then
 		self.__tags = {}
-		table.insert(self.__elements, onShow)
+		table.insert(self.__elements, ForceUpdate)
 	else
 		-- Since people ignore everything that's good practice - unregister the tag
 		-- if it already exists.
@@ -790,3 +795,4 @@ oUF.Tags = {
 
 oUF:RegisterMetaFunction('Tag', Tag)
 oUF:RegisterMetaFunction('Untag', Untag)
+oUF:RegisterMetaFunction('ForceUpdateTags', ForceUpdate)
