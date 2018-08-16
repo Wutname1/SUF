@@ -166,6 +166,14 @@ for k, v in next, {
 		return active and active[name]
 	end,
 
+	--[[ frame:IsEnabled()
+
+	Used to check if the given frame is enabled or not. This is a reference to `UnitWatchRegistered`.
+
+	* self - unit frame
+	--]]
+	IsEnabled = UnitWatchRegistered,
+
 	--[[ frame:Enable(asState)
 	Used to toggle the visibility of a unit frame based on the existence of its unit. This is a reference to
 	`RegisterUnitWatch`.
@@ -298,6 +306,13 @@ local function initObject(unit, style, styleFunc, header, ...)
 				enableTargetUpdate(object)
 			else
 				oUF:HandleUnit(object)
+			end
+
+			-- Arena preparation
+			if(unit and unit:match('arena%d?$')) then
+				object:RegisterEvent('ARENA_PREP_OPPONENT_SPECIALIZATIONS', Private.UpdateArenaPreperation, true)
+				-- the event handler only fires for visible frames, so we have to hook it
+				object:HookScript('OnEvent', Private.UpdateArenaPreperation)
 			end
 		else
 			-- Used to update frames when they change position in a group.
