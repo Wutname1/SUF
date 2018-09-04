@@ -186,9 +186,18 @@ local tagStrings = {
 	end]],
 
 	['raidcolor'] = [[function(u)
-		local _, x = UnitClass(u)
-		if(x) then
-			return Hex(_COLORS.class[x])
+		local _, class = UnitClass(u)
+		if(class) then
+			return Hex(_COLORS.class[class])
+		else
+			local id = u:match('arena(%d)$')
+			if(id) then
+				local specID = GetArenaOpponentSpec(tonumber(id))
+				if(specID and specID > 0) then
+					_, _, _, _, _, class = GetSpecializationInfoByID(specID)
+					return Hex(_COLORS.class[class])
+				end
+			end
 		end
 	end]],
 
@@ -410,6 +419,17 @@ local tagStrings = {
 
 		return amount
 	end]],
+
+	['arenaspec'] = [[function(u)
+		local id = u:match('arena(%d)$')
+		if(id) then
+			local specID = GetArenaOpponentSpec(tonumber(id))
+			if(specID and specID > 0) then
+				local _, specName = GetSpecializationInfoByID(specID)
+				return specName
+			end
+		end
+	end]],
 }
 
 local tags = setmetatable(
@@ -493,6 +513,7 @@ local tagEvents = {
 	['arcanecharges']       = 'UNIT_POWER_UPDATE SPELLS_CHANGED',
 	['powercolor']          = 'UNIT_DISPLAYPOWER',
 	['runes']               = 'RUNE_POWER_UPDATE',
+	['arenaspec']           = 'ARENA_PREP_OPPONENT_SPECIALIZATIONS',
 }
 
 local unitlessEvents = {
@@ -502,6 +523,7 @@ local unitlessEvents = {
 	PARTY_LEADER_CHANGED = true,
 	GROUP_ROSTER_UPDATE = true,
 	RUNE_POWER_UPDATE = true,
+	ARENA_PREP_OPPONENT_SPECIALIZATIONS = true,
 }
 
 local events = {}
@@ -546,7 +568,12 @@ local function createOnUpdate(timer)
 	end
 end
 
-local function onShow(self)
+--[[ Tags: frame:UpdateTags()
+Used to update all tags on a frame.
+
+* self - the unit frame from which to update the tags
+--]]
+local function Update(self)
 	for _, fs in next, self.__tags do
 		fs:UpdateTag()
 	end
@@ -610,7 +637,7 @@ local function Tag(self, fs, tagstr, ...)
 
 	if(not self.__tags) then
 		self.__tags = {}
-		table.insert(self.__elements, onShow)
+		table.insert(self.__elements, Update)
 	else
 		-- Since people ignore everything that's good practice - unregister the tag
 		-- if it already exists.
@@ -817,3 +844,4 @@ oUF.Tags = {
 
 oUF:RegisterMetaFunction('Tag', Tag)
 oUF:RegisterMetaFunction('Untag', Untag)
+oUF:RegisterMetaFunction('UpdateTags', Update)
