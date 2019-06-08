@@ -25,14 +25,14 @@ A default texture will be applied if the widget is a StatusBar and doesn't have 
     Stagger:SetSize(120, 20)
     Stagger:SetPoint('TOPLEFT', self, 'BOTTOMLEFT', 0, 0)
 
-    -- Register with oUF
+    -- Register with SUF
     self.Stagger = Stagger
 --]]
 
 if(select(2, UnitClass('player')) ~= 'MONK') then return end
 
 local _, ns = ...
-local oUF = ns.oUF
+local SUF = ns.SUF
 
 -- sourced from FrameXML/Constants.lua
 local SPEC_MONK_BREWMASTER = SPEC_MONK_BREWMASTER or 1
@@ -207,4 +207,4 @@ local function Disable(self)
 	end
 end
 
-oUF:AddElement('Stagger', VisibilityPath, Enable, Disable)
+SUF:AddElement('Stagger', VisibilityPath, Enable, Disable)

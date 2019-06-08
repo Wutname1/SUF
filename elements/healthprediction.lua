@@ -68,7 +68,7 @@ A default texture will be applied to the Texture widgets if they don't have a te
     overHealAbsorb:SetPoint('RIGHT', self.Health, 'LEFT')
     overHealAbsorb:SetWidth(10)
 
-    -- Register with oUF
+    -- Register with SUF
     self.HealthPrediction = {
         myBar = myBar,
         otherBar = otherBar,
@@ -82,7 +82,7 @@ A default texture will be applied to the Texture widgets if they don't have a te
 --]]
 
 local _, ns = ...
-local oUF = ns.oUF
+local SUF = ns.SUF
 
 local function Update(self, event, unit)
 	if(self.unit ~= unit) then return end
@@ -311,4 +311,4 @@ local function Disable(self)
 	end
 end
 
-oUF:AddElement('HealthPrediction', Path, Enable, Disable)
+SUF:AddElement('HealthPrediction', Path, Enable, Disable)

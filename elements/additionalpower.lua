@@ -46,13 +46,13 @@ The following options are listed by priority. The first check that returns true 
     Background:SetAllPoints(AdditionalPower)
     Background:SetTexture(1, 1, 1, .5)
 
-    -- Register it with oUF
+    -- Register it with SUF
     AdditionalPower.bg = Background
     self.AdditionalPower = AdditionalPower
 --]]
 
 local _, ns = ...
-local oUF = ns.oUF
+local SUF = ns.SUF
 
 local _, playerClass = UnitClass('player')
 
@@ -225,4 +225,4 @@ local function Disable(self)
 	end
 end
 
-oUF:AddElement('AdditionalPower', VisibilityPath, Enable, Disable)
+SUF:AddElement('AdditionalPower', VisibilityPath, Enable, Disable)

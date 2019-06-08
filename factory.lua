@@ -1,6 +1,6 @@
 local parent, ns = ...
-local oUF = ns.oUF
-local Private = oUF.Private
+local SUF = ns.SUF
+local Private = SUF.Private
 
 local argcheck = Private.argcheck
 
@@ -17,21 +17,21 @@ function factory:PLAYER_LOGIN()
 	if(not self.active) then return end
 
 	for _, func in next, queue do
-		func(oUF)
+		func(SUF)
 	end
 
 	-- Avoid creating dupes.
 	wipe(queue)
 end
 
---[[ Factory: oUF:Factory(func)
+--[[ Factory: SUF:Factory(func)
 Used to call a function directly if the current character is logged in and the factory is active. Else the function is
 queued up to be executed at a later time (upon PLAYER_LOGIN by default).
 
-* self - the global oUF object
+* self - the global SUF object
 * func - function to be executed or delayed (function)
 --]]
-function oUF:Factory(func)
+function SUF:Factory(func)
 	argcheck(func, 2, 'function')
 
 	-- Call the function directly if we're active and logged in.
@@ -42,30 +42,30 @@ function oUF:Factory(func)
 	end
 end
 
---[[ Factory: oUF:EnableFactory()
+--[[ Factory: SUF:EnableFactory()
 Used to enable the factory.
 
-* self - the global oUF object
+* self - the global SUF object
 --]]
-function oUF:EnableFactory()
+function SUF:EnableFactory()
 	factory.active = true
 end
 
---[[ Factory: oUF:DisableFactory()
+--[[ Factory: SUF:DisableFactory()
 Used to disable the factory.
 
-* self - the global oUF object
+* self - the global SUF object
 --]]
-function oUF:DisableFactory()
+function SUF:DisableFactory()
 	factory.active = nil
 end
 
---[[ Factory: oUF:RunFactoryQueue()
+--[[ Factory: SUF:RunFactoryQueue()
 Used to try to execute queued up functions. The current player must be logged in and the factory must be active for
 this to succeed.
 
-* self - the global oUF object
+* self - the global SUF object
 --]]
-function oUF:RunFactoryQueue()
+function SUF:RunFactoryQueue()
 	factory:PLAYER_LOGIN()
 end

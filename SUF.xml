@@ -1,7 +1,7 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
 	<Script file="init.lua"/>
 	<Script file="private.lua"/>
-	<Script file="ouf.lua"/>
+	<Script file="SUF.lua"/>
 	<Script file="events.lua"/>
 	<Script file="factory.lua"/>
 	<Script file="blizzard.lua"/>
@@ -43,7 +43,7 @@
 
 	<!--
 		Sub-object as a child of the parent unit frame:
-	<Button name="oUF_HeaderTargetTemplate" inherits="SecureUnitButtonTemplate" virtual="true">
+	<Button name="SUF_HeaderTargetTemplate" inherits="SecureUnitButtonTemplate" virtual="true">
 		<Frames>
 			<Button name="$parentTarget" inherits="SecureUnitButtonTemplate">
 				<Attributes>
@@ -55,9 +55,9 @@
 	</Button>
 
 		Separate unit template example:
-	<Button name="oUF_HeaderSeparateSubOjectsTemplate" inherits="SecureUnitButtonTemplate" virtual="true">
+	<Button name="SUF_HeaderSeparateSubOjectsTemplate" inherits="SecureUnitButtonTemplate" virtual="true">
 		<Attributes>
-			<Attribute name="oUF-onlyProcessChildren" type="boolean" value="true"/>
+			<Attribute name="SUF-onlyProcessChildren" type="boolean" value="true"/>
 		</Attributes>
 
 		<Frames>

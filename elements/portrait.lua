@@ -20,7 +20,7 @@ the unit.
     Portrait:SetSize(32, 32)
     Portrait:SetPoint('RIGHT', self, 'LEFT')
 
-    -- Register it with oUF
+    -- Register it with SUF
     self.Portrait = Portrait
 
     -- 2D Portrait
@@ -28,12 +28,12 @@ the unit.
     Portrait:SetSize(32, 32)
     Portrait:SetPoint('RIGHT', self, 'LEFT')
 
-    -- Register it with oUF
+    -- Register it with SUF
     self.Portrait = Portrait
 --]]
 
 local _, ns = ...
-local oUF = ns.oUF
+local SUF = ns.SUF
 
 local function Update(self, event, unit)
 	if(not unit or not UnitIsUnit(self.unit, unit)) then return end
@@ -139,4 +139,4 @@ local function Disable(self)
 	end
 end
 
-oUF:AddElement('Portrait', Path, Enable, Disable)
+SUF:AddElement('Portrait', Path, Enable, Disable)

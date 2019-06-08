@@ -18,12 +18,12 @@ A default texture will be applied if the widget is a Texture and doesn't have a 
     QuestIndicator:SetSize(16, 16)
     QuestIndicator:SetPoint('TOPRIGHT', self)
 
-    -- Register it with oUF
+    -- Register it with SUF
     self.QuestIndicator = QuestIndicator
 --]]
 
 local _, ns = ...
-local oUF = ns.oUF
+local SUF = ns.SUF
 
 local function Update(self, event, unit)
 	if(unit ~= self.unit) then return end
@@ -97,4 +97,4 @@ local function Disable(self)
 	end
 end
 
-oUF:AddElement('QuestIndicator', Path, Enable, Disable)
+SUF:AddElement('QuestIndicator', Path, Enable, Disable)

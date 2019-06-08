@@ -18,12 +18,12 @@ A default texture will be applied if the widget is a Texture and doesn't have a 
     ResurrectIndicator:SetSize(16, 16)
     ResurrectIndicator:SetPoint('TOPRIGHT', self)
 
-    -- Register it with oUF
+    -- Register it with SUF
     self.ResurrectIndicator = ResurrectIndicator
 --]]
 
 local _, ns = ...
-local oUF = ns.oUF
+local SUF = ns.SUF
 
 local function Update(self, event, unit)
 	if(self.unit ~= unit) then return end
@@ -97,4 +97,4 @@ local function Disable(self)
 	end
 end
 
-oUF:AddElement('ResurrectIndicator', Path, Enable, Disable)
+SUF:AddElement('ResurrectIndicator', Path, Enable, Disable)

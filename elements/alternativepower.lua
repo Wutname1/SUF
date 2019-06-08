@@ -22,12 +22,12 @@ A default texture will be applied if the widget is a StatusBar and doesn't have 
     AlternativePower:SetPoint('LEFT')
     AlternativePower:SetPoint('RIGHT')
 
-    -- Register with oUF
+    -- Register with SUF
     self.AlternativePower = AlternativePower
 --]]
 
 local _, ns = ...
-local oUF = ns.oUF
+local SUF = ns.SUF
 
 -- sourced from FrameXML/UnitPowerBarAlt.lua
 local ALTERNATE_POWER_INDEX = Enum.PowerType.Alternate or 10
@@ -195,4 +195,4 @@ local function Disable(self, unit)
 	end
 end
 
-oUF:AddElement('AlternativePower', VisibilityPath, Enable, Disable)
+SUF:AddElement('AlternativePower', VisibilityPath, Enable, Disable)

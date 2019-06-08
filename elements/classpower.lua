@@ -40,12 +40,12 @@ Supported class powers:
         ClassPower[index] = Bar
     end
 
-    -- Register with oUF
+    -- Register with SUF
     self.ClassPower = ClassPower
 --]]
 
 local _, ns = ...
-local oUF = ns.oUF
+local SUF = ns.SUF
 
 local _, PlayerClass = UnitClass('player')
 
@@ -317,4 +317,4 @@ local function Disable(self)
 	end
 end
 
-oUF:AddElement('ClassPower', VisibilityPath, Enable, Disable)
+SUF:AddElement('ClassPower', VisibilityPath, Enable, Disable)

@@ -28,9 +28,9 @@ tag function is called when the unit frame is shown or when a specified event ha
 eventless frame (i.e. one holding the unit "targettarget"), then the tag function is called in a set time interval.
 
 A number of built-in tag functions exist. The layout can also define its own tag functions by adding them to the
-`oUF.Tags.Methods` table. The events upon which the function will be called are specified in a white-space separated
-list added to the `oUF.Tags.Events` table. Should an event fire without unit information, then it should also be listed
-in the `oUF.Tags.SharedEvents` table as follows: `oUF.Tags.SharedEvents.EVENT_NAME = true`.
+`SUF.Tags.Methods` table. The events upon which the function will be called are specified in a white-space separated
+list added to the `SUF.Tags.Events` table. Should an event fire without unit information, then it should also be listed
+in the `SUF.Tags.SharedEvents` table as follows: `SUF.Tags.SharedEvents.EVENT_NAME = true`.
 
 ## Options
 
@@ -48,26 +48,26 @@ in the `oUF.Tags.SharedEvents` table as follows: `oUF.Tags.SharedEvents.EVENT_NA
 ## Examples
 
     -- define the tag function
-    oUF.Tags.Methods['mylayout:threatname'] = function(unit, realUnit)
+    SUF.Tags.Methods['mylayout:threatname'] = function(unit, realUnit)
         local color = _TAGS['threatcolor'](unit)
         local name = _TAGS['name'](unit, realUnit)
         return string.format('%s%s|r', color, name)
     end
 
     -- add the events
-    oUF.Tags.Events['mylayout:threatname'] = 'UNIT_NAME_UPDATE UNIT_THREAT_SITUATION_UPDATE'
+    SUF.Tags.Events['mylayout:threatname'] = 'UNIT_NAME_UPDATE UNIT_THREAT_SITUATION_UPDATE'
 
     -- create the text widget
     local info = self.Health:CreateFontString(nil, 'OVERLAY', 'GameFontNormal')
     info:SetPoint('LEFT')
 
-    -- register the tag on the text widget with oUF
+    -- register the tag on the text widget with SUF
     self:Tag(info, '[mylayout:threatname]')
 --]]
 
 local _, ns = ...
-local oUF = ns.oUF
-local Private = oUF.Private
+local SUF = ns.SUF
+local Private = SUF.Private
 
 local unitExists = Private.unitExists
 
@@ -847,12 +847,12 @@ local function Untag(self, fs)
 	fs.UpdateTag = nil
 end
 
-oUF.Tags = {
+SUF.Tags = {
 	Methods = tags,
 	Events = tagEvents,
 	SharedEvents = unitlessEvents,
 }
 
-oUF:RegisterMetaFunction('Tag', Tag)
-oUF:RegisterMetaFunction('Untag', Untag)
-oUF:RegisterMetaFunction('UpdateTags', Update)
+SUF:RegisterMetaFunction('Tag', Tag)
+SUF:RegisterMetaFunction('Untag', Untag)
+SUF:RegisterMetaFunction('UpdateTags', Update)

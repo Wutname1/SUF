@@ -1,0 +1,12 @@
+## Interface: 80100
+## Title: SUF
+## Author: wutname1, Haste, lightspark, p3lim, Rainrider
+## Version: @project-version@
+## Notes: Unit frame framework. Does nothing by itself.
+## OptionalDeps: Clique
+## X-SUF: SUF
+
+## X-Curse-Project-ID: nil
+## X-WoWI-ID: nil
+
+SUF.xml

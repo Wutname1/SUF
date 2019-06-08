@@ -1,5 +1,5 @@
 local parent, ns = ...
-local oUF = ns.oUF
+local SUF = ns.SUF
 
 -- sourced from Blizzard_ArenaUI/Blizzard_ArenaUI.lua
 local MAX_ARENA_ENEMIES = MAX_ARENA_ENEMIES or 5
@@ -56,7 +56,7 @@ local function handleFrame(baseName)
 	end
 end
 
-function oUF:DisableBlizzard(unit)
+function SUF:DisableBlizzard(unit)
 	if(not unit) then return end
 
 	if(unit == 'player') then

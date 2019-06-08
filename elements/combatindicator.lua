@@ -18,12 +18,12 @@ A default texture will be applied if the widget is a Texture and doesn't have a 
     CombatIndicator:SetSize(16, 16)
     CombatIndicator:SetPoint('TOP', self)
 
-    -- Register it with oUF
+    -- Register it with SUF
     self.CombatIndicator = CombatIndicator
 --]]
 
 local _, ns = ...
-local oUF = ns.oUF
+local SUF = ns.SUF
 
 local function Update(self, event)
 	local element = self.CombatIndicator
@@ -97,4 +97,4 @@ local function Disable(self)
 	end
 end
 
-oUF:AddElement('CombatIndicator', Path, Enable, Disable)
+SUF:AddElement('CombatIndicator', Path, Enable, Disable)

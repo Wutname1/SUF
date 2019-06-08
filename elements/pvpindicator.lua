@@ -27,13 +27,13 @@ The `Badge` sub-widget has to be on a lower sub-layer than the `PvP` texture.
     Badge:SetSize(50, 52)
     Badge:SetPoint('CENTER', PvPIndicator, 'CENTER')
 
-    -- Register it with oUF
+    -- Register it with SUF
     PvPIndicator.Badge = Badge
     self.PvPIndicator = PvPIndicator
 --]]
 
 local _, ns = ...
-local oUF = ns.oUF
+local SUF = ns.SUF
 
 local function Update(self, event, unit)
 	if(unit and unit ~= self.unit) then return end
@@ -148,4 +148,4 @@ local function Disable(self)
 	end
 end
 
-oUF:AddElement('PvPIndicator', Path, Enable, Disable)
+SUF:AddElement('PvPIndicator', Path, Enable, Disable)

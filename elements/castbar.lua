@@ -2,7 +2,7 @@
 # Element: Castbar
 
 Handles the visibility and updating of spell castbars.
-Based upon oUF_Castbar by starlon.
+Based upon SUF_Castbar by starlon.
 
 ## Widget
 
@@ -73,7 +73,7 @@ A default texture will be applied to the StatusBar and Texture widgets if they d
     -- Add safezone
     local SafeZone = Castbar:CreateTexture(nil, 'OVERLAY')
 
-    -- Register it with oUF
+    -- Register it with SUF
     Castbar.bg = Background
     Castbar.Spark = Spark
     Castbar.Time = Time
@@ -84,7 +84,7 @@ A default texture will be applied to the StatusBar and Texture widgets if they d
     self.Castbar = Castbar
 --]]
 local _, ns = ...
-local oUF = ns.oUF
+local SUF = ns.SUF
 
 local GetNetStats = GetNetStats
 local GetTime = GetTime
@@ -602,4 +602,4 @@ local function Disable(self)
 	end
 end
 
-oUF:AddElement('Castbar', Update, Enable, Disable)
+SUF:AddElement('Castbar', Update, Enable, Disable)

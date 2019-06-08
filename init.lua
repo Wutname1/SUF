@@ -1,3 +1,3 @@
 local parent, ns = ...
-ns.oUF = {}
-ns.oUF.Private = {}
+ns.SUF = {}
+ns.SUF.Private = {}

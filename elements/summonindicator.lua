@@ -18,12 +18,12 @@ This element updates by changing the texture.
     SummonIndicator:SetSize(32, 32)
     SummonIndicator:SetPoint('TOPRIGHT', self)
 
-    -- Register it with oUF
+    -- Register it with SUF
     self.SummonIndicator = SummonIndicator
 --]]
 
 local _, ns = ...
-local oUF = ns.oUF
+local SUF = ns.SUF
 
 -- sourced from Blizzard_APIDocumentation/IncomingSummonDocumentation.lua
 local SUMMON_STATUS_NONE = Enum.SummonStatus.None or 0
@@ -107,4 +107,4 @@ local function Disable(self)
 	end
 end
 
-oUF:AddElement('SummonIndicator', Path, Enable, Disable)
+SUF:AddElement('SummonIndicator', Path, Enable, Disable)

@@ -89,14 +89,14 @@ The following options are listed by priority. The first check that returns true 
     -- Make the background darker.
     Background.multiplier = .5
 
-    -- Register it with oUF
+    -- Register it with SUF
 	Power.bg = Background
     self.Power = Power
 --]]
 
 local _, ns = ...
-local oUF = ns.oUF
-local Private = oUF.Private
+local SUF = ns.SUF
+local Private = SUF.Private
 
 local unitSelectionType = Private.unitSelectionType
 
@@ -332,4 +332,4 @@ local function Disable(self)
 	end
 end
 
-oUF:AddElement('Power', Path, Enable, Disable)
+SUF:AddElement('Power', Path, Enable, Disable)

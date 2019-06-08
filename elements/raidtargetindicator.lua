@@ -18,12 +18,12 @@ A default texture will be applied if the widget is a Texture and doesn't have a 
     RaidTargetIndicator:SetSize(16, 16)
     RaidTargetIndicator:SetPoint('TOPRIGHT', self)
 
-    -- Register it with oUF
+    -- Register it with SUF
     self.RaidTargetIndicator = RaidTargetIndicator
 --]]
 
 local _, ns = ...
-local oUF = ns.oUF
+local SUF = ns.SUF
 
 local GetRaidTargetIndex = GetRaidTargetIndex
 local SetRaidTargetIconTexture = SetRaidTargetIconTexture
@@ -99,4 +99,4 @@ local function Disable(self)
 	end
 end
 
-oUF:AddElement('RaidTargetIndicator', Path, Enable, Disable)
+SUF:AddElement('RaidTargetIndicator', Path, Enable, Disable)

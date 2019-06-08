@@ -1,6 +1,6 @@
 local parent, ns = ...
-local oUF = ns.oUF
-local Private = oUF.Private
+local SUF = ns.SUF
+local Private = SUF.Private
 
 local enableTargetUpdate = Private.enableTargetUpdate
 
@@ -96,7 +96,7 @@ local function updateArenaPreparationElements(self, event, elementName, specID)
 end
 
 local function updateArenaPreparation(self, event)
-	if(not self:GetAttribute('oUF-enableArenaPrep')) then
+	if(not self:GetAttribute('SUF-enableArenaPrep')) then
 		return
 	end
 
@@ -163,7 +163,7 @@ local function updateArenaPreparation(self, event)
 end
 
 -- Handles unit specific actions.
-function oUF:HandleUnit(object, unit)
+function SUF:HandleUnit(object, unit)
 	local unit = object.unit or unit
 	if(unit == 'target') then
 		object:RegisterEvent('PLAYER_TARGET_CHANGED', object.UpdateAllElements, true)
@@ -177,7 +177,7 @@ function oUF:HandleUnit(object, unit)
 	elseif(unit:match('arena%d?$')) then
 		object:RegisterEvent('ARENA_OPPONENT_UPDATE', object.UpdateAllElements, true)
 		object:RegisterEvent('ARENA_PREP_OPPONENT_SPECIALIZATIONS', updateArenaPreparation, true)
-		object:SetAttribute('oUF-enableArenaPrep', true)
+		object:SetAttribute('SUF-enableArenaPrep', true)
 		-- the event handler only fires for visible frames, so we have to hook it for arena prep
 		object:HookScript('OnEvent', updateArenaPreparation)
 	elseif(unit:match('%w+target')) then

@@ -18,7 +18,7 @@ Offline units are handled as if they are in range.
 
 ## Examples
 
-    -- Register with oUF
+    -- Register with SUF
     self.Range = {
         insideAlpha = 1,
         outsideAlpha = 1/2,
@@ -26,7 +26,7 @@ Offline units are handled as if they are in range.
 --]]
 
 local _, ns = ...
-local oUF = ns.oUF
+local SUF = ns.SUF
 
 local _FRAMES = {}
 local OnRangeFrame
@@ -135,4 +135,4 @@ local function Disable(self)
 	end
 end
 
-oUF:AddElement('Range', nil, Enable, Disable)
+SUF:AddElement('Range', nil, Enable, Disable)
