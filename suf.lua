@@ -19,6 +19,8 @@ local callback, objects, headers = {}, {}, {}
 local elements = {}
 local activeElements = {}
 
+SUF.IsClassic = select(4, GetBuildInfo()) < 20000
+
 local PetBattleFrameHider = CreateFrame('Frame', (global or parent) .. '_PetBattleFrameHider', UIParent, 'SecureHandlerStateTemplate')
 PetBattleFrameHider:SetAllPoints()
 PetBattleFrameHider:SetFrameStrata('LOW')
@@ -281,8 +283,10 @@ local function initObject(unit, style, styleFunc, header, ...)
 		end
 
 		if(not (suffix == 'target' or objectUnit and objectUnit:match('target'))) then
-			object:RegisterEvent('UNIT_ENTERED_VEHICLE', updateActiveUnit)
-			object:RegisterEvent('UNIT_EXITED_VEHICLE', updateActiveUnit)
+			if not SUF.IsClassic then
+				object:RegisterEvent('UNIT_ENTERED_VEHICLE', updateActiveUnit)
+				object:RegisterEvent('UNIT_EXITED_VEHICLE', updateActiveUnit)
+			end
 
 			-- We don't need to register UNIT_PET for the player unit. We register it
 			-- mainly because UNIT_EXITED_VEHICLE and UNIT_ENTERED_VEHICLE doesn't always

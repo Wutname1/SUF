@@ -5,6 +5,10 @@ local Private = SUF.Private
 local enableTargetUpdate = Private.enableTargetUpdate
 
 local function updateArenaPreparationElements(self, event, elementName, specID)
+	if SUF.IsClassic then
+		return
+	end
+
 	local element = self[elementName]
 	if(element and self:IsElementEnabled(elementName)) then
 		if(element.OverrideArenaPreparation) then
@@ -96,7 +100,7 @@ local function updateArenaPreparationElements(self, event, elementName, specID)
 end
 
 local function updateArenaPreparation(self, event)
-	if(not self:GetAttribute('SUF-enableArenaPrep')) then
+	if(not self:GetAttribute('SUF-enableArenaPrep')) or SUF.IsClassic then
 		return
 	end
 
@@ -169,12 +173,12 @@ function SUF:HandleUnit(object, unit)
 		object:RegisterEvent('PLAYER_TARGET_CHANGED', object.UpdateAllElements, true)
 	elseif(unit == 'mouseover') then
 		object:RegisterEvent('UPDATE_MOUSEOVER_UNIT', object.UpdateAllElements, true)
-	elseif(unit == 'focus') then
+	elseif(unit == 'focus') and not SUF.IsClassic then
 		object:RegisterEvent('PLAYER_FOCUS_CHANGED', object.UpdateAllElements, true)
 	elseif(unit:match('boss%d?$')) then
 		object:RegisterEvent('INSTANCE_ENCOUNTER_ENGAGE_UNIT', object.UpdateAllElements, true)
 		object:RegisterEvent('UNIT_TARGETABLE_CHANGED', object.UpdateAllElements)
-	elseif(unit:match('arena%d?$')) then
+	elseif(unit:match('arena%d?$') and not SUF.IsClassic) then
 		object:RegisterEvent('ARENA_OPPONENT_UPDATE', object.UpdateAllElements, true)
 		object:RegisterEvent('ARENA_PREP_OPPONENT_SPECIALIZATIONS', updateArenaPreparation, true)
 		object:SetAttribute('SUF-enableArenaPrep', true)
