@@ -32,6 +32,10 @@ local _, ns = ...
 local SUF = ns.SUF
 local Private = SUF.Private
 
+if SUF.IsClassic then
+	return
+end
+
 local unitExists = Private.unitExists
 
 local function Update(self, event, unit)

@@ -35,6 +35,10 @@ The `Badge` sub-widget has to be on a lower sub-layer than the `PvP` texture.
 local _, ns = ...
 local SUF = ns.SUF
 
+if SUF.IsClassic then
+	return
+end
+
 local function Update(self, event, unit)
 	if(unit and unit ~= self.unit) then return end
 

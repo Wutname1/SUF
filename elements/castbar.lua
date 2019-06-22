@@ -86,6 +86,10 @@ A default texture will be applied to the StatusBar and Texture widgets if they d
 local _, ns = ...
 local SUF = ns.SUF
 
+if SUF.IsClassic then
+	return
+end
+
 local GetNetStats = GetNetStats
 local GetTime = GetTime
 local UnitCastingInfo = UnitCastingInfo

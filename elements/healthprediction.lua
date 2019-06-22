@@ -84,6 +84,10 @@ A default texture will be applied to the Texture widgets if they don't have a te
 local _, ns = ...
 local SUF = ns.SUF
 
+if SUF.IsClassic then
+	return
+end
+
 local function Update(self, event, unit)
 	if(self.unit ~= unit) then return end
 

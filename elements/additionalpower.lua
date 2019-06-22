@@ -54,6 +54,10 @@ The following options are listed by priority. The first check that returns true 
 local _, ns = ...
 local SUF = ns.SUF
 
+if SUF.IsClassic then
+	return
+end
+
 local _, playerClass = UnitClass('player')
 
 -- sourced from FrameXML/AlternatePowerBar.lua

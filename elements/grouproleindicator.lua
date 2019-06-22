@@ -25,6 +25,10 @@ A default texture will be applied if the widget is a Texture and doesn't have a 
 local _, ns = ...
 local SUF = ns.SUF
 
+if SUF.IsClassic then
+	return
+end
+
 local function Update(self, event)
 	local element = self.GroupRoleIndicator
 

@@ -29,6 +29,10 @@ This element updates by changing the texture.
 local _, ns = ...
 local SUF = ns.SUF
 
+if SUF.IsClassic then
+	return
+end
+
 -- sourced from FrameXML/CompactUnitFrame.lua
 local ICONS = {
 	[Enum.PvpUnitClassification.FlagCarrierHorde or 0] = "nameplates-icon-flag-horde",
