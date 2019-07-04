@@ -123,7 +123,11 @@ function SUF:DisableBlizzard(unit)
 	elseif(unit:match('nameplate%d+$')) then
 		local frame = C_NamePlate.GetNamePlateForUnit(unit)
 		if(frame and frame.UnitFrame) then
-			frame.UnitFrame:HookScript('OnShow', insecureOnShow)
+			if(not frame.UnitFrame.isHooked) then
+				frame.UnitFrame:HookScript('OnShow', insecureOnShow)
+				frame.UnitFrame.isHooked = true
+			end
+			
 			handleFrame(frame.UnitFrame, true)
 		end
 	end
