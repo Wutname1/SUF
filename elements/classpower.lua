@@ -102,7 +102,12 @@ local function Update(self, event, unit, powerType)
 	local cur, max, mod, oldMax
 	if (event ~= 'ClassPowerDisable') then
 		local powerID = unit == 'vehicle' and SPELL_POWER_COMBO_POINTS or ClassPowerID
-		cur = UnitPower(unit, powerID, true)
+		if SUF.IsClassic then
+			cur = _G.GetComboPoints(unit, 'target')
+		else
+			cur = UnitPower(unit, powerID, true)
+		end
+
 		max = UnitPowerMax(unit, powerID)
 		mod = UnitPowerDisplayMod(powerID)
 
@@ -172,16 +177,29 @@ local function Visibility(self, event, unit)
 	if not SUF.IsClassic and (UnitHasVehicleUI('player')) then
 		shouldEnable = PlayerVehicleHasComboPoints()
 		unit = 'vehicle'
-	elseif (ClassPowerID and not SUF.IsClassic) then
-		if (not RequireSpec or RequireSpec == GetSpecialization()) then
-			-- use 'player' instead of unit because 'SPELLS_CHANGED' is a unitless event
+	elseif (ClassPowerID) then
+		if SUF.IsClassic then
 			if (not RequirePower or RequirePower == UnitPowerType('player')) then
+				-- use 'player' instead of unit because 'SPELLS_CHANGED' is a unitless event
 				if (not RequireSpell or IsPlayerSpell(RequireSpell)) then
 					self:UnregisterEvent('SPELLS_CHANGED', Visibility)
 					shouldEnable = true
 					unit = 'player'
 				else
 					self:RegisterEvent('SPELLS_CHANGED', Visibility, true)
+				end
+			end
+		else
+			if (not RequireSpec or RequireSpec == GetSpecialization()) then
+				-- use 'player' instead of unit because 'SPELLS_CHANGED' is a unitless event
+				if (not RequirePower or RequirePower == UnitPowerType('player')) then
+					if (not RequireSpell or IsPlayerSpell(RequireSpell)) then
+						self:UnregisterEvent('SPELLS_CHANGED', Visibility)
+						shouldEnable = true
+						unit = 'player'
+					else
+						self:RegisterEvent('SPELLS_CHANGED', Visibility, true)
+					end
 				end
 			end
 		end
