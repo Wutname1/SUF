@@ -21,12 +21,17 @@ A default texture will be applied if the widget is a Texture and doesn't have a 
     -- Register it with SUF
     self.QuestIndicator = QuestIndicator
 --]]
-
 local _, ns = ...
 local SUF = ns.SUF
 
+if SUF.IsClassic then
+	return
+end
+
 local function Update(self, event, unit)
-	if(unit ~= self.unit) then return end
+	if (unit ~= self.unit) then
+		return
+	end
 
 	local element = self.QuestIndicator
 
