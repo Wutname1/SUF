@@ -27,19 +27,16 @@ A default texture will be applied if the widget is a Texture and doesn't have a 
     -- Register it with SUF
     self.ThreatIndicator = ThreatIndicator
 --]]
-
 local _, ns = ...
 local SUF = ns.SUF
 local Private = SUF.Private
 
-if SUF.IsClassic then
-	return
-end
-
 local unitExists = Private.unitExists
 
 local function Update(self, event, unit)
-	if(unit ~= self.unit) then return end
+	if (unit ~= self.unit) then
+		return
+	end
 
 	local element = self.ThreatIndicator
 	--[[ Callback: ThreatIndicator:PreUpdate(unit)
@@ -48,15 +45,17 @@ local function Update(self, event, unit)
 	* self - the ThreatIndicator element
 	* unit - the unit for which the update has been triggered (string)
 	--]]
-	if(element.PreUpdate) then element:PreUpdate(unit) end
+	if (element.PreUpdate) then
+		element:PreUpdate(unit)
+	end
 
 	local feedbackUnit = element.feedbackUnit
 	unit = unit or self.unit
 
 	local status
 	-- BUG: Non-existent '*target' or '*pet' units cause UnitThreatSituation() errors
-	if(unitExists(unit)) then
-		if(feedbackUnit and feedbackUnit ~= unit and unitExists(feedbackUnit)) then
+	if (unitExists(unit)) then
+		if (feedbackUnit and feedbackUnit ~= unit and unitExists(feedbackUnit)) then
 			status = UnitThreatSituation(feedbackUnit, unit)
 		else
 			status = UnitThreatSituation(unit)
@@ -64,10 +63,10 @@ local function Update(self, event, unit)
 	end
 
 	local r, g, b
-	if(status and status > 0) then
+	if (status and status > 0) then
 		r, g, b = GetThreatStatusColor(status)
 
-		if(element.SetVertexColor) then
+		if (element.SetVertexColor) then
 			element:SetVertexColor(r, g, b)
 		end
 
@@ -86,12 +85,18 @@ local function Update(self, event, unit)
 	* g      - the green color component based on the unit's threat status (number?)[0-1]
 	* b      - the blue color component based on the unit's threat status (number?)[0-1]
 	--]]
-	if(element.PostUpdate) then
+	if (element.PostUpdate) then
 		return element:PostUpdate(unit, status, r, g, b)
 	end
 end
 
 local function Path(self, ...)
+	-- Hide the element if Classic WoW
+	if SUF.IsClassic and self.ThreatIndicator then
+		self.ThreatIndicator:Hide()
+		return
+	end
+
 	--[[ Override: ThreatIndicator.Override(self, event, ...)
 	Used to completely override the internal update function.
 
@@ -99,7 +104,7 @@ local function Path(self, ...)
 	* event - the event triggering the update (string)
 	* ...   - the arguments accompanying the event
 	--]]
-	return (self.ThreatIndicator.Override or Update) (self, ...)
+	return (self.ThreatIndicator.Override or Update)(self, ...)
 end
 
 local function ForceUpdate(element)
@@ -108,14 +113,21 @@ end
 
 local function Enable(self)
 	local element = self.ThreatIndicator
-	if(element) then
+
+	if (element) then
+		-- Hide the element if Classic WoW
+		if SUF.IsClassic then
+			element:Hide()
+			return
+		end
+
 		element.__owner = self
 		element.ForceUpdate = ForceUpdate
 
 		self:RegisterEvent('UNIT_THREAT_SITUATION_UPDATE', Path)
 		self:RegisterEvent('UNIT_THREAT_LIST_UPDATE', Path)
 
-		if(element:IsObjectType('Texture') and not element:GetTexture()) then
+		if (element:IsObjectType('Texture') and not element:GetTexture()) then
 			element:SetTexture([[Interface\RAIDFRAME\UI-RaidFrame-Threat]])
 		end
 
@@ -125,7 +137,7 @@ end
 
 local function Disable(self)
 	local element = self.ThreatIndicator
-	if(element) then
+	if (element) then
 		element:Hide()
 
 		self:UnregisterEvent('UNIT_THREAT_SITUATION_UPDATE', Path)

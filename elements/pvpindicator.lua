@@ -58,7 +58,10 @@ local function Update(self, event, unit)
 
 	local status
 	local factionGroup = UnitFactionGroup(unit) or 'Neutral'
-	local honorRewardInfo = C_PvP.GetHonorRewardInfo(UnitHonorLevel(unit))
+	local honorRewardInfo = false
+	if not SUF.IsClassic then
+		honorRewardInfo = C_PvP.GetHonorRewardInfo(UnitHonorLevel(unit))
+	end
 
 	if (UnitIsPVPFreeForAll(unit)) then
 		status = 'FFA'
