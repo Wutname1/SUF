@@ -108,9 +108,19 @@ local function UNIT_SPELLCAST_START(self, event, unit)
 	if (self.unit ~= unit and self.realUnit ~= unit) then
 		return
 	end
+	if SUF.IsClassic and unit ~= 'player' then
+		return
+	end
 
 	local element = self.Castbar
-	local name, text, texture, startTime, endTime, _, castID, notInterruptible, spellID = UnitCastingInfo(unit)
+	local name, text, texture, startTime, endTime, castID, notInterruptible, spellID = nil
+
+	if SUF.IsClassic then
+		name, text, texture, startTime, endTime, _, castID, notInterruptible = CastingInfo()
+	else
+		name, text, texture, startTime, endTime, _, castID, notInterruptible, spellID = UnitCastingInfo(unit)
+	end
+
 	if (not name) then
 		return element:Hide()
 	end
@@ -339,9 +349,18 @@ local function UNIT_SPELLCAST_CHANNEL_START(self, event, unit, _, spellID)
 	if (self.unit ~= unit and self.realUnit ~= unit) then
 		return
 	end
+	if SUF.IsClassic and unit ~= 'player' then
+		return
+	end
 
 	local element = self.Castbar
-	local name, _, texture, startTime, endTime, _, notInterruptible = UnitChannelInfo(unit)
+	local name, _, texture, startTime, endTime, _, notInterruptible, spellID = nil
+	if SUF.IsClassic then
+		name, _, texture, startTime, endTime, _, notInterruptible, spellID = ChannelInfo()
+	else
+		name, _, texture, startTime, endTime, _, notInterruptible = UnitChannelInfo(unit)
+	end
+
 	if (not name) then
 		return
 	end
@@ -558,9 +577,6 @@ local function onUpdate(self, elapsed)
 end
 
 local function Update(self, ...)
-	if SUF.IsClassic then
-		return
-	end
 	UNIT_SPELLCAST_START(self, ...)
 	return UNIT_SPELLCAST_CHANNEL_START(self, ...)
 end
@@ -572,10 +588,10 @@ end
 local function Enable(self, unit)
 	local element = self.Castbar
 	if (element) then
-		if SUF.IsClassic then
-			element:Hide()
-			return
-		end
+		-- if SUF.IsClassic then
+		-- 	element:Hide()
+		-- 	return
+		-- end
 		element.__owner = self
 		element.ForceUpdate = ForceUpdate
 
@@ -584,12 +600,14 @@ local function Enable(self, unit)
 			self:RegisterEvent('UNIT_SPELLCAST_FAILED', UNIT_SPELLCAST_FAILED)
 			self:RegisterEvent('UNIT_SPELLCAST_STOP', UNIT_SPELLCAST_STOP)
 			self:RegisterEvent('UNIT_SPELLCAST_INTERRUPTED', UNIT_SPELLCAST_INTERRUPTED)
-			self:RegisterEvent('UNIT_SPELLCAST_INTERRUPTIBLE', UNIT_SPELLCAST_INTERRUPTIBLE)
-			self:RegisterEvent('UNIT_SPELLCAST_NOT_INTERRUPTIBLE', UNIT_SPELLCAST_NOT_INTERRUPTIBLE)
 			self:RegisterEvent('UNIT_SPELLCAST_DELAYED', UNIT_SPELLCAST_DELAYED)
 			self:RegisterEvent('UNIT_SPELLCAST_CHANNEL_START', UNIT_SPELLCAST_CHANNEL_START)
 			self:RegisterEvent('UNIT_SPELLCAST_CHANNEL_UPDATE', UNIT_SPELLCAST_CHANNEL_UPDATE)
 			self:RegisterEvent('UNIT_SPELLCAST_CHANNEL_STOP', UNIT_SPELLCAST_CHANNEL_STOP)
+			if not SUF.IsClassic then
+				self:RegisterEvent('UNIT_SPELLCAST_INTERRUPTIBLE', UNIT_SPELLCAST_INTERRUPTIBLE)
+				self:RegisterEvent('UNIT_SPELLCAST_NOT_INTERRUPTIBLE', UNIT_SPELLCAST_NOT_INTERRUPTIBLE)
+			end
 		end
 
 		element.horizontal = element:GetOrientation() == 'HORIZONTAL'
@@ -638,8 +656,10 @@ local function Disable(self)
 		self:UnregisterEvent('UNIT_SPELLCAST_FAILED', UNIT_SPELLCAST_FAILED)
 		self:UnregisterEvent('UNIT_SPELLCAST_STOP', UNIT_SPELLCAST_STOP)
 		self:UnregisterEvent('UNIT_SPELLCAST_INTERRUPTED', UNIT_SPELLCAST_INTERRUPTED)
-		self:UnregisterEvent('UNIT_SPELLCAST_INTERRUPTIBLE', UNIT_SPELLCAST_INTERRUPTIBLE)
-		self:UnregisterEvent('UNIT_SPELLCAST_NOT_INTERRUPTIBLE', UNIT_SPELLCAST_NOT_INTERRUPTIBLE)
+		if not SUF.IsClassic then
+			self:RegisterEvent('UNIT_SPELLCAST_INTERRUPTIBLE', UNIT_SPELLCAST_INTERRUPTIBLE)
+			self:RegisterEvent('UNIT_SPELLCAST_NOT_INTERRUPTIBLE', UNIT_SPELLCAST_NOT_INTERRUPTIBLE)
+		end
 		self:UnregisterEvent('UNIT_SPELLCAST_DELAYED', UNIT_SPELLCAST_DELAYED)
 		self:UnregisterEvent('UNIT_SPELLCAST_CHANNEL_START', UNIT_SPELLCAST_CHANNEL_START)
 		self:UnregisterEvent('UNIT_SPELLCAST_CHANNEL_UPDATE', UNIT_SPELLCAST_CHANNEL_UPDATE)
