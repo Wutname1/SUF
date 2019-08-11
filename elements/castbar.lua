@@ -294,7 +294,12 @@ local function UNIT_SPELLCAST_DELAYED(self, event, unit)
 	end
 
 	local element = self.Castbar
-	local name, _, _, startTime = UnitCastingInfo(unit)
+	local name, startTime = nil
+	if SUF.IsClassic then
+		name, _, _, startTime = CastingInfo()
+	else
+		name, _, _, startTime = UnitCastingInfo(unit)
+	end
 	if (not startTime or not element:IsShown()) then
 		return
 	end
