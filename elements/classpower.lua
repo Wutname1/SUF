@@ -277,7 +277,7 @@ do
 		ClassPowerID = SPELL_POWER_HOLY_POWER
 		ClassPowerType = 'HOLY_POWER'
 		RequireSpec = SPEC_PALADIN_RETRIBUTION
-	elseif (PlayerClass == 'WARLOCK') then
+	elseif (PlayerClass == 'WARLOCK') and not SUF.IsClassic then
 		ClassPowerID = SPELL_POWER_SOUL_SHARDS
 		ClassPowerType = 'SOUL_SHARDS'
 	elseif (PlayerClass == 'ROGUE' or PlayerClass == 'DRUID') then
@@ -288,7 +288,7 @@ do
 			RequirePower = SPELL_POWER_ENERGY
 			RequireSpell = 5221 -- Shred
 		end
-	elseif (PlayerClass == 'MAGE') then
+	elseif (PlayerClass == 'MAGE') and not SUF.IsClassic then
 		ClassPowerID = SPELL_POWER_ARCANE_CHARGES
 		ClassPowerType = 'ARCANE_CHARGES'
 		RequireSpec = SPEC_MAGE_ARCANE
