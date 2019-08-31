@@ -66,7 +66,7 @@ local function Update(self, event, unit)
 	if (UnitIsPVPFreeForAll(unit)) then
 		status = 'FFA'
 	elseif (factionGroup ~= 'Neutral' and UnitIsPVP(unit)) then
-		if (unit == 'player' and UnitIsMercenary(unit)) then
+		if (unit == 'player' and not SUF.IsClassic and UnitIsMercenary(unit)) then
 			if (factionGroup == 'Horde') then
 				factionGroup = 'Alliance'
 			elseif (factionGroup == 'Alliance') then
