@@ -286,7 +286,7 @@ do
 
 		if (PlayerClass == 'DRUID') then
 			RequirePower = SPELL_POWER_ENERGY
-			RequireSpell = 5221 -- Shred
+			RequireSpell = SUF.IsClassic and 768 or 5221 -- Cat form or Shred
 		end
 	elseif (PlayerClass == 'MAGE') and not SUF.IsClassic then
 		ClassPowerID = SPELL_POWER_ARCANE_CHARGES
