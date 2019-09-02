@@ -4,6 +4,7 @@ local _VERSION = '@project-version@'
 if(_VERSION:find('project%-version')) then
 	_VERSION = 'devel'
 end
+ns.oUF = ns.SUF
 
 local SUF = ns.SUF
 local Private = SUF.Private
