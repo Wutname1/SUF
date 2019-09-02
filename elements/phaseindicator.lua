@@ -21,12 +21,13 @@ A default texture will be applied if the widget is a Texture and doesn't have a 
     -- Register it with SUF
     self.PhaseIndicator = PhaseIndicator
 --]]
-
 local _, ns = ...
 local SUF = ns.SUF
 
 local function Update(self, event, unit)
-	if(self.unit ~= unit) then return end
+	if (self.unit ~= unit) then
+		return
+	end
 
 	local element = self.PhaseIndicator
 
@@ -35,12 +36,12 @@ local function Update(self, event, unit)
 
 	* self - the PhaseIndicator element
 	--]]
-	if(element.PreUpdate) then
+	if (element.PreUpdate) then
 		element:PreUpdate()
 	end
 
 	local isInSamePhase = UnitInPhase(unit) and not UnitIsWarModePhased(unit)
-	if(not isInSamePhase and UnitIsPlayer(unit) and UnitIsConnected(unit)) then
+	if (not isInSamePhase and UnitIsPlayer(unit) and UnitIsConnected(unit)) then
 		element:Show()
 	else
 		element:Hide()
@@ -52,7 +53,7 @@ local function Update(self, event, unit)
 	* self          - the PhaseIndicator element
 	* isInSamePhase - indicates whether the unit is in the same phase as the player (boolean)
 	--]]
-	if(element.PostUpdate) then
+	if (element.PostUpdate) then
 		return element:PostUpdate(isInSamePhase)
 	end
 end
@@ -65,7 +66,7 @@ local function Path(self, ...)
 	* event - the event triggering the update (string)
 	* ...   - the arguments accompanying the event
 	--]]
-	return (self.PhaseIndicator.Override or Update) (self, ...)
+	return (self.PhaseIndicator.Override or Update)(self, ...)
 end
 
 local function ForceUpdate(element)
@@ -74,13 +75,18 @@ end
 
 local function Enable(self)
 	local element = self.PhaseIndicator
-	if(element) then
+	if (element) then
+		if SUF.IsClassic then
+			element:Hide()
+			return
+		end
+
 		element.__owner = self
 		element.ForceUpdate = ForceUpdate
 
 		self:RegisterEvent('UNIT_PHASE', Path)
 
-		if(element:IsObjectType('Texture') and not element:GetTexture()) then
+		if (element:IsObjectType('Texture') and not element:GetTexture()) then
 			element:SetTexture([[Interface\TargetingFrame\UI-PhasingIcon]])
 		end
 
@@ -90,7 +96,7 @@ end
 
 local function Disable(self)
 	local element = self.PhaseIndicator
-	if(element) then
+	if (element) then
 		element:Hide()
 
 		self:UnregisterEvent('UNIT_PHASE', Path)
