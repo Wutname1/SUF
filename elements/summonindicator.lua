@@ -24,6 +24,9 @@ This element updates by changing the texture.
 local _, ns = ...
 local SUF = ns.SUF
 
+if SUF.IsClassic then
+	return
+end
 -- sourced from Blizzard_APIDocumentation/IncomingSummonDocumentation.lua
 local SUMMON_STATUS_NONE = Enum.SummonStatus.None or 0
 local SUMMON_STATUS_PENDING = Enum.SummonStatus.Pending or 1
@@ -90,10 +93,6 @@ end
 local function Enable(self)
 	local element = self.SummonIndicator
 	if (element) then
-		if SUF.IsClassic then
-			element:Hide()
-			return
-		end
 		element.__owner = self
 		element.ForceUpdate = ForceUpdate
 
