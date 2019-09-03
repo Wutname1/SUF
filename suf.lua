@@ -454,11 +454,11 @@ function SUF:SetActiveStyle(name)
 	style = name
 end
 
---[[ oUF:GetActiveStyle()
+--[[ SUF:GetActiveStyle()
 Used to get the active style.
-* self - the global oUF object
+* self - the global SUF object
 --]]
-function oUF:GetActiveStyle()
+function SUF:GetActiveStyle()
 	return style
 end
 
