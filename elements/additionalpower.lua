@@ -163,13 +163,17 @@ end
 local function Visibility(self, event, unit)
 	local element = self.AdditionalPower
 	local shouldEnable
-
-	if (not UnitHasVehicleUI('player')) then
+	if not SUF.IsClassic and (not UnitHasVehicleUI('player')) then
 		if (UnitPowerMax(unit, ADDITIONAL_POWER_BAR_INDEX) ~= 0) then
 			if (element.displayPairs[playerClass]) then
 				local powerType = UnitPowerType(unit)
 				shouldEnable = element.displayPairs[playerClass][powerType]
 			end
+		end
+	elseif SUF.IsClassic and playerClass == 'DRUID' then
+		local form = GetShapeshiftForm()
+		if form == 1 or form == 2 or form == 3 then
+			shouldEnable = true
 		end
 	end
 
@@ -188,9 +192,9 @@ local function VisibilityPath(self, ...)
 	* event - the event triggering the update (string)
 	* unit  - the unit accompanying the event (string)
 	--]]
-	if SUF.IsClassic then
-		return
-	end
+	-- if SUF.IsClassic then
+	-- 	return
+	-- end
 	return (self.AdditionalPower.OverrideVisibility or Visibility)(self, ...)
 end
 
@@ -200,17 +204,14 @@ end
 
 local function Enable(self, unit)
 	local element = self.AdditionalPower
-	if (element and UnitIsUnit(unit, 'player')) then
-		if SUF.IsClassic then
-			element:Hide()
-			return
-		end
+	if (element) then
 		element.__owner = self
 		element.ForceUpdate = ForceUpdate
 
+		self:RegisterEvent('UNIT_POWER_UPDATE', VisibilityPath)
 		self:RegisterEvent('UNIT_DISPLAYPOWER', VisibilityPath)
 
-		if (not element.displayPairs) then
+		if (not element.displayPairs and not SUF.IsClassic) then
 			element.displayPairs = CopyTable(ALT_MANA_BAR_PAIR_DISPLAY_INFO)
 		end
 
