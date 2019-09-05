@@ -170,7 +170,7 @@ local function Visibility(self, event, unit)
 				shouldEnable = element.displayPairs[playerClass][powerType]
 			end
 		end
-	elseif SUF.IsClassic and playerClass == 'DRUID' then
+	elseif SUF.IsClassic and playerClass == 'DRUID' and unit == 'player' then
 		local form = GetShapeshiftForm()
 		if form == 1 or form == 2 or form == 3 then
 			shouldEnable = true
