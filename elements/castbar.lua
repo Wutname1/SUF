@@ -437,7 +437,13 @@ local function UNIT_SPELLCAST_CHANNEL_UPDATE(self, event, unit)
 	end
 
 	local element = self.Castbar
-	local name, _, _, startTime, endTime = UnitChannelInfo(unit)
+	local name, _, _, startTime, endTime
+
+	if SUF.IsClassic then
+		name, _, _, startTime, endTime = ChannelInfo()
+	else
+		name, _, _, startTime, endTime = UnitChannelInfo(unit)
+	end
 	if (not name or not element:IsShown()) then
 		return
 	end
