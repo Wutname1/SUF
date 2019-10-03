@@ -24,6 +24,7 @@ A default texture will be applied to the StatusBar and Texture widgets if they d
 
 .timeToHold - indicates for how many seconds the castbar should be visible after a _FAILED or _INTERRUPTED
               event. Defaults to 0 (number)
+.hideTradeSkills - Makes the element ignore casts related to crafting professions (boolean) (ClassicOnly)
 
 ## Attributes
 
@@ -88,8 +89,259 @@ local SUF = ns.SUF
 
 local GetNetStats = GetNetStats
 local GetTime = GetTime
+local DEFAULT_ICON = [[Interface\ICONS\INV_Misc_QuestionMark]]
+local LibClassicCasterino = LibStub('LibClassicCasterino', true)
 local UnitCastingInfo = UnitCastingInfo
 local UnitChannelInfo = UnitChannelInfo
+local EventFunctions = {}
+
+if SUF.IsClassic then
+	UnitCastingInfo = CastingInfo
+	UnitChannelInfo = ChannelInfo
+end
+
+local function resetAttributes(self)
+	self.castID = nil
+	self.casting = nil
+	self.channeling = nil
+	self.notInterruptible = nil
+	self.spellID = nil
+end
+
+local function CastStart(self, event, unit)
+	if (self.unit ~= unit) then
+		return
+	end
+
+	local element = self.Castbar
+
+	local name, _, texture, startTime, endTime, isTradeSkill, castID, notInterruptible, spellID = UnitCastingInfo(unit)
+	event = 'UNIT_SPELLCAST_START'
+	if (not name) then
+		name, _, texture, startTime, endTime, isTradeSkill, notInterruptible, spellID = UnitChannelInfo(unit)
+		event = 'UNIT_SPELLCAST_CHANNEL_START'
+	end
+
+	if (not name or (isTradeSkill and element.hideTradeSkills)) then
+		resetAttributes(element)
+		element:Hide()
+
+		return
+	end
+
+	endTime = endTime / 1000
+	startTime = startTime / 1000
+
+	element.max = endTime - startTime
+	element.startTime = startTime
+	element.delay = 0
+	element.casting = event == 'UNIT_SPELLCAST_START'
+	element.channeling = event == 'UNIT_SPELLCAST_CHANNEL_START'
+	element.notInterruptible = notInterruptible
+	element.holdTime = 0
+	element.castID = castID
+	element.spellID = spellID
+
+	if (element.casting) then
+		element.duration = GetTime() - startTime
+	else
+		element.duration = endTime - GetTime()
+	end
+
+	element:SetMinMaxValues(0, element.max)
+	element:SetValue(element.duration)
+
+	if texture == 136235 then
+		texture = DEFAULT_ICON
+	end
+
+	if (element.Icon) then
+		element.Icon:SetTexture(texture or DEFAULT_ICON)
+	end
+	if (element.Shield) then
+		element.Shield:SetShown(notInterruptible)
+	end
+	if (element.Spark) then
+		element.Spark:Show()
+	end
+	if (element.Text) then
+		element.Text:SetText(name)
+	end
+	if (element.Time) then
+		element.Time:SetText()
+	end
+
+	local safeZone = element.SafeZone
+	if (safeZone) then
+		local isHoriz = element:GetOrientation() == 'HORIZONTAL'
+
+		safeZone:ClearAllPoints()
+		safeZone:SetPoint(isHoriz and 'TOP' or 'LEFT')
+		safeZone:SetPoint(isHoriz and 'BOTTOM' or 'RIGHT')
+
+		if (element.casting) then
+			safeZone:SetPoint(element:GetReverseFill() and (isHoriz and 'LEFT' or 'BOTTOM') or (isHoriz and 'RIGHT' or 'TOP'))
+		else
+			safeZone:SetPoint(element:GetReverseFill() and (isHoriz and 'RIGHT' or 'TOP') or (isHoriz and 'LEFT' or 'BOTTOM'))
+		end
+
+		local ratio = (select(4, GetNetStats()) / 1000) / element.max
+		if (ratio > 1) then
+			ratio = 1
+		end
+
+		safeZone[isHoriz and 'SetWidth' or 'SetHeight'](
+			safeZone,
+			element[isHoriz and 'GetWidth' or 'GetHeight'](element) * ratio
+		)
+	end
+
+	--[[ Callback: Castbar:PostCastStart(unit)
+	Called after the element has been updated upon a spell cast start.
+
+	* self - the Castbar widget
+	* unit - the unit for which the update has been triggered (string)
+	--]]
+	if (element.PostCastStart) then
+		element:PostCastStart(unit)
+	end
+
+	element:Show()
+end
+
+local function CastUpdate(self, event, unit, castID, spellID)
+	if (self.unit ~= unit) then
+		return
+	end
+
+	local element = self.Castbar
+	if unit == 'player' then
+		if (not element:IsShown() or element.castID ~= castID or element.spellID ~= spellID) then
+			return
+		end
+	else
+		if (not element:IsShown()) then
+			return
+		end
+	end
+
+	local name, startTime, endTime, _
+	if (event == 'UNIT_SPELLCAST_DELAYED') then
+		name, _, _, startTime, endTime = UnitCastingInfo(unit)
+	else
+		name, _, _, startTime, endTime = UnitChannelInfo(unit)
+	end
+
+	if (not name) then
+		return
+	end
+
+	endTime = endTime / 1000
+	startTime = startTime / 1000
+
+	local delta
+	if (element.casting) then
+		delta = startTime - element.startTime
+
+		element.duration = GetTime() - startTime
+	else
+		delta = element.startTime - startTime
+
+		element.duration = endTime - GetTime()
+	end
+
+	if (delta < 0) then
+		delta = 0
+	end
+
+	element.max = endTime - startTime
+	element.startTime = startTime
+	element.delay = element.delay + delta
+
+	element:SetMinMaxValues(0, element.max)
+	element:SetValue(element.duration)
+
+	--[[ Callback: Castbar:PostCastUpdate(unit)
+	Called after the element has been updated when a spell cast has been updated.
+
+	* self - the Castbar widget
+	* unit - the unit that the update has been triggered (string)
+	--]]
+	if (element.PostCastUpdate) then
+		return element:PostCastUpdate(unit)
+	end
+end
+
+local function CastStop(self, event, unit, castID, spellID)
+	if (self.unit ~= unit) then
+		return
+	end
+
+	local element = self.Castbar
+	if unit == 'player' then
+		if (not element:IsShown() or element.castID ~= castID or element.spellID ~= spellID) then
+			return
+		end
+	else
+		if (not element:IsShown()) then
+			return
+		end
+	end
+
+	resetAttributes(element)
+
+	--[[ Callback: Castbar:PostCastStop(unit, spellID)
+	Called after the element has been updated when a spell cast has stopped.
+
+	* self    - the Castbar widget
+	* unit    - the unit for which the update has been triggered (string)
+	* spellID - the ID of the spell (number)
+	--]]
+	if (element.PostCastStop) then
+		return element:PostCastStop(unit, spellID)
+	end
+end
+
+local function CastFail(self, event, unit, castID, spellID)
+	if (self.unit ~= unit) then
+		return
+	end
+
+	local element = self.Castbar
+	if unit == 'player' then
+		if (not element:IsShown() or element.castID ~= castID or element.spellID ~= spellID) then
+			return
+		end
+	else
+		if (not element:IsShown()) then
+			return
+		end
+	end
+
+	if (element.Text) then
+		element.Text:SetText(event == 'UNIT_SPELLCAST_FAILED' and FAILED or INTERRUPTED)
+	end
+
+	if (element.Spark) then
+		element.Spark:Hide()
+	end
+
+	element.holdTime = element.timeToHold or 0
+
+	resetAttributes(element)
+	element:SetValue(element.max)
+
+	--[[ Callback: Castbar:PostCastFail(unit, spellID)
+	Called after the element has been updated upon a failed spell cast.
+
+	* self    - the Castbar widget
+	* unit    - the unit for which the update has been triggered (string)
+	* spellID - the ID of the spell (number)
+	--]]
+	if (element.PostCastFail) then
+		return element:PostCastFail(unit, spellID)
+	end
+end
 
 local function updateSafeZone(self)
 	local safeZone = self.SafeZone
@@ -113,13 +365,7 @@ local function UNIT_SPELLCAST_START(self, event, unit)
 	end
 
 	local element = self.Castbar
-	local name, text, texture, startTime, endTime, castID, notInterruptible, spellID = nil
-
-	if SUF.IsClassic then
-		name, text, texture, startTime, endTime, _, castID, notInterruptible = CastingInfo()
-	else
-		name, text, texture, startTime, endTime, _, castID, notInterruptible, spellID = UnitCastingInfo(unit)
-	end
+	local name, text, texture, startTime, endTime, castID, notInterruptible, spellID = UnitCastingInfo(unit)
 
 	if (not name) then
 		return element:Hide()
@@ -145,7 +391,7 @@ local function UNIT_SPELLCAST_START(self, event, unit)
 		element.Text:SetText(text)
 	end
 	if (element.Icon) then
-		element.Icon:SetTexture(texture)
+		element.Icon:SetTexture(texture or DEFAULT_ICON)
 	end
 	if (element.Time) then
 		element.Time:SetText()
@@ -294,12 +540,7 @@ local function UNIT_SPELLCAST_DELAYED(self, event, unit)
 	end
 
 	local element = self.Castbar
-	local name, startTime = nil
-	if SUF.IsClassic then
-		name, _, _, startTime = CastingInfo()
-	else
-		name, _, _, startTime = UnitCastingInfo(unit)
-	end
+	local name, startTime = UnitCastingInfo(unit)
 	if (not startTime or not element:IsShown()) then
 		return
 	end
@@ -359,12 +600,7 @@ local function UNIT_SPELLCAST_CHANNEL_START(self, event, unit, _, spellID)
 	end
 
 	local element = self.Castbar
-	local name, _, texture, startTime, endTime, _, notInterruptible, spellID = nil
-	if SUF.IsClassic then
-		name, _, texture, startTime, endTime, _, notInterruptible, spellID = ChannelInfo()
-	else
-		name, _, texture, startTime, endTime, _, notInterruptible = UnitChannelInfo(unit)
-	end
+	local name, _, texture, startTime, endTime, _, notInterruptible, spellID = UnitChannelInfo(unit)
 
 	if (not name) then
 		return
@@ -437,13 +673,7 @@ local function UNIT_SPELLCAST_CHANNEL_UPDATE(self, event, unit)
 	end
 
 	local element = self.Castbar
-	local name, _, _, startTime, endTime
-
-	if SUF.IsClassic then
-		name, _, _, startTime, endTime = ChannelInfo()
-	else
-		name, _, _, startTime, endTime = UnitChannelInfo(unit)
-	end
+	local name, _, _, startTime, endTime = UnitChannelInfo(unit)
 	if (not name or not element:IsShown()) then
 		return
 	end
@@ -606,18 +836,35 @@ local function Enable(self, unit)
 		element.__owner = self
 		element.ForceUpdate = ForceUpdate
 
-		if (not (unit and unit:match '%wtarget$')) then
-			self:RegisterEvent('UNIT_SPELLCAST_START', UNIT_SPELLCAST_START)
-			self:RegisterEvent('UNIT_SPELLCAST_FAILED', UNIT_SPELLCAST_FAILED)
-			self:RegisterEvent('UNIT_SPELLCAST_STOP', UNIT_SPELLCAST_STOP)
-			self:RegisterEvent('UNIT_SPELLCAST_INTERRUPTED', UNIT_SPELLCAST_INTERRUPTED)
-			self:RegisterEvent('UNIT_SPELLCAST_DELAYED', UNIT_SPELLCAST_DELAYED)
-			self:RegisterEvent('UNIT_SPELLCAST_CHANNEL_START', UNIT_SPELLCAST_CHANNEL_START)
-			self:RegisterEvent('UNIT_SPELLCAST_CHANNEL_UPDATE', UNIT_SPELLCAST_CHANNEL_UPDATE)
-			self:RegisterEvent('UNIT_SPELLCAST_CHANNEL_STOP', UNIT_SPELLCAST_CHANNEL_STOP)
-			if not SUF.IsClassic then
-				self:RegisterEvent('UNIT_SPELLCAST_INTERRUPTIBLE', UNIT_SPELLCAST_INTERRUPTIBLE)
-				self:RegisterEvent('UNIT_SPELLCAST_NOT_INTERRUPTIBLE', UNIT_SPELLCAST_NOT_INTERRUPTIBLE)
+		if (element and unit and not unit:match('%wtarget$')) then
+			if LibClassicCasterino and SUF.IsClassic then
+				local CastbarEventHandler = function(event, ...)
+					print(event)
+
+					return EventFunctions[event](self, event, ...)
+				end
+
+				LibClassicCasterino.RegisterCallback(self, 'UNIT_SPELLCAST_START', CastbarEventHandler)
+				LibClassicCasterino.RegisterCallback(self, 'UNIT_SPELLCAST_DELAYED', CastbarEventHandler)
+				LibClassicCasterino.RegisterCallback(self, 'UNIT_SPELLCAST_STOP', CastbarEventHandler)
+				LibClassicCasterino.RegisterCallback(self, 'UNIT_SPELLCAST_FAILED', CastbarEventHandler)
+				LibClassicCasterino.RegisterCallback(self, 'UNIT_SPELLCAST_INTERRUPTED', CastbarEventHandler)
+				LibClassicCasterino.RegisterCallback(self, 'UNIT_SPELLCAST_CHANNEL_START', CastbarEventHandler)
+				LibClassicCasterino.RegisterCallback(self, 'UNIT_SPELLCAST_CHANNEL_UPDATE', CastbarEventHandler)
+				LibClassicCasterino.RegisterCallback(self, 'UNIT_SPELLCAST_CHANNEL_STOP', CastbarEventHandler)
+			else
+				self:RegisterEvent('UNIT_SPELLCAST_START', UNIT_SPELLCAST_START)
+				self:RegisterEvent('UNIT_SPELLCAST_FAILED', UNIT_SPELLCAST_FAILED)
+				self:RegisterEvent('UNIT_SPELLCAST_STOP', UNIT_SPELLCAST_STOP)
+				self:RegisterEvent('UNIT_SPELLCAST_INTERRUPTED', UNIT_SPELLCAST_INTERRUPTED)
+				self:RegisterEvent('UNIT_SPELLCAST_DELAYED', UNIT_SPELLCAST_DELAYED)
+				self:RegisterEvent('UNIT_SPELLCAST_CHANNEL_START', UNIT_SPELLCAST_CHANNEL_START)
+				self:RegisterEvent('UNIT_SPELLCAST_CHANNEL_UPDATE', UNIT_SPELLCAST_CHANNEL_UPDATE)
+				self:RegisterEvent('UNIT_SPELLCAST_CHANNEL_STOP', UNIT_SPELLCAST_CHANNEL_STOP)
+				if not SUF.IsClassic then
+					self:RegisterEvent('UNIT_SPELLCAST_INTERRUPTIBLE', UNIT_SPELLCAST_INTERRUPTIBLE)
+					self:RegisterEvent('UNIT_SPELLCAST_NOT_INTERRUPTIBLE', UNIT_SPELLCAST_NOT_INTERRUPTIBLE)
+				end
 			end
 		end
 
@@ -663,21 +910,51 @@ local function Disable(self)
 	if (element) then
 		element:Hide()
 
-		self:UnregisterEvent('UNIT_SPELLCAST_START', UNIT_SPELLCAST_START)
-		self:UnregisterEvent('UNIT_SPELLCAST_FAILED', UNIT_SPELLCAST_FAILED)
-		self:UnregisterEvent('UNIT_SPELLCAST_STOP', UNIT_SPELLCAST_STOP)
-		self:UnregisterEvent('UNIT_SPELLCAST_INTERRUPTED', UNIT_SPELLCAST_INTERRUPTED)
-		if not SUF.IsClassic then
-			self:RegisterEvent('UNIT_SPELLCAST_INTERRUPTIBLE', UNIT_SPELLCAST_INTERRUPTIBLE)
-			self:RegisterEvent('UNIT_SPELLCAST_NOT_INTERRUPTIBLE', UNIT_SPELLCAST_NOT_INTERRUPTIBLE)
+		if LibClassicCasterino and SUF.IsClassic then
+			LibClassicCasterino.UnregisterCallback(self, 'UNIT_SPELLCAST_START')
+			LibClassicCasterino.UnregisterCallback(self, 'UNIT_SPELLCAST_DELAYED')
+			LibClassicCasterino.UnregisterCallback(self, 'UNIT_SPELLCAST_STOP')
+			LibClassicCasterino.UnregisterCallback(self, 'UNIT_SPELLCAST_FAILED')
+			LibClassicCasterino.UnregisterCallback(self, 'UNIT_SPELLCAST_INTERRUPTED')
+			LibClassicCasterino.UnregisterCallback(self, 'UNIT_SPELLCAST_CHANNEL_START')
+			LibClassicCasterino.UnregisterCallback(self, 'UNIT_SPELLCAST_CHANNEL_UPDATE')
+			LibClassicCasterino.UnregisterCallback(self, 'UNIT_SPELLCAST_CHANNEL_STOP')
+		else
+			self:UnregisterEvent('UNIT_SPELLCAST_START', UNIT_SPELLCAST_START)
+			self:UnregisterEvent('UNIT_SPELLCAST_FAILED', UNIT_SPELLCAST_FAILED)
+			self:UnregisterEvent('UNIT_SPELLCAST_STOP', UNIT_SPELLCAST_STOP)
+			self:UnregisterEvent('UNIT_SPELLCAST_INTERRUPTED', UNIT_SPELLCAST_INTERRUPTED)
+			if not SUF.IsClassic then
+				self:RegisterEvent('UNIT_SPELLCAST_INTERRUPTIBLE', UNIT_SPELLCAST_INTERRUPTIBLE)
+				self:RegisterEvent('UNIT_SPELLCAST_NOT_INTERRUPTIBLE', UNIT_SPELLCAST_NOT_INTERRUPTIBLE)
+			end
+			self:UnregisterEvent('UNIT_SPELLCAST_DELAYED', UNIT_SPELLCAST_DELAYED)
+			self:UnregisterEvent('UNIT_SPELLCAST_CHANNEL_START', UNIT_SPELLCAST_CHANNEL_START)
+			self:UnregisterEvent('UNIT_SPELLCAST_CHANNEL_UPDATE', UNIT_SPELLCAST_CHANNEL_UPDATE)
+			self:UnregisterEvent('UNIT_SPELLCAST_CHANNEL_STOP', UNIT_SPELLCAST_CHANNEL_STOP)
 		end
-		self:UnregisterEvent('UNIT_SPELLCAST_DELAYED', UNIT_SPELLCAST_DELAYED)
-		self:UnregisterEvent('UNIT_SPELLCAST_CHANNEL_START', UNIT_SPELLCAST_CHANNEL_START)
-		self:UnregisterEvent('UNIT_SPELLCAST_CHANNEL_UPDATE', UNIT_SPELLCAST_CHANNEL_UPDATE)
-		self:UnregisterEvent('UNIT_SPELLCAST_CHANNEL_STOP', UNIT_SPELLCAST_CHANNEL_STOP)
 
 		element:SetScript('OnUpdate', nil)
 	end
+end
+
+if LibClassicCasterino and SUF.IsClassic then
+	UnitCastingInfo = function(unit)
+		return LibClassicCasterino:UnitCastingInfo(unit)
+	end
+
+	UnitChannelInfo = function(unit)
+		return LibClassicCasterino:UnitChannelInfo(unit)
+	end
+
+	EventFunctions['UNIT_SPELLCAST_START'] = CastStart
+	EventFunctions['UNIT_SPELLCAST_FAILED'] = CastFail
+	EventFunctions['UNIT_SPELLCAST_INTERRUPTED'] = CastFail
+	EventFunctions['UNIT_SPELLCAST_DELAYED'] = CastUpdate
+	EventFunctions['UNIT_SPELLCAST_STOP'] = CastStop
+	EventFunctions['UNIT_SPELLCAST_CHANNEL_START'] = CastStart
+	EventFunctions['UNIT_SPELLCAST_CHANNEL_UPDATE'] = CastUpdate
+	EventFunctions['UNIT_SPELLCAST_CHANNEL_STOP'] = CastStop
 end
 
 SUF:AddElement('Castbar', Update, Enable, Disable)
