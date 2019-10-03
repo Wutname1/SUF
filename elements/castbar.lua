@@ -839,8 +839,6 @@ local function Enable(self, unit)
 		if (element and unit and not unit:match('%wtarget$')) then
 			if LibClassicCasterino and SUF.IsClassic then
 				local CastbarEventHandler = function(event, ...)
-					print(event)
-
 					return EventFunctions[event](self, event, ...)
 				end
 
