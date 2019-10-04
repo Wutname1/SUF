@@ -365,7 +365,7 @@ local function UNIT_SPELLCAST_START(self, event, unit)
 	end
 
 	local element = self.Castbar
-	local name, text, texture, startTime, endTime, castID, notInterruptible, spellID = UnitCastingInfo(unit)
+	local name, text, texture, startTime, endTime, _, castID, notInterruptible, spellID = UnitCastingInfo(unit)
 
 	if (not name) then
 		return element:Hide()
@@ -837,7 +837,7 @@ local function Enable(self, unit)
 		element.ForceUpdate = ForceUpdate
 
 		if (element and unit and not unit:match('%wtarget$')) then
-			if LibClassicCasterino and SUF.IsClassic then
+			if LibClassicCasterino and SUF.IsClassic and unit ~= 'player' then
 				local CastbarEventHandler = function(event, ...)
 					return EventFunctions[event](self, event, ...)
 				end
