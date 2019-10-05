@@ -540,7 +540,7 @@ local function UNIT_SPELLCAST_DELAYED(self, event, unit)
 	end
 
 	local element = self.Castbar
-	local name, startTime = UnitCastingInfo(unit)
+	local name, _, _, startTime = UnitCastingInfo(unit)
 	if (not startTime or not element:IsShown()) then
 		return
 	end
@@ -829,10 +829,6 @@ end
 local function Enable(self, unit)
 	local element = self.Castbar
 	if (element) then
-		-- if SUF.IsClassic then
-		-- 	element:Hide()
-		-- 	return
-		-- end
 		element.__owner = self
 		element.ForceUpdate = ForceUpdate
 
