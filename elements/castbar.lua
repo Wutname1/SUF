@@ -833,7 +833,7 @@ local function Enable(self, unit)
 		element.ForceUpdate = ForceUpdate
 
 		if (element and unit and not unit:match('%wtarget$')) then
-			if LibClassicCasterino and SUF.IsClassic and unit ~= 'player' then
+			if LibClassicCasterino and SUF.IsClassic then
 				local CastbarEventHandler = function(event, ...)
 					return EventFunctions[event](self, event, ...)
 				end
