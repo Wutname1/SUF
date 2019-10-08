@@ -447,9 +447,8 @@ local function Enable(self, unit)
 				self:RegisterEvent('UNIT_SPELLCAST_INTERRUPTIBLE', CastInterruptible)
 				self:RegisterEvent('UNIT_SPELLCAST_NOT_INTERRUPTIBLE', CastInterruptible)
 			end
-
-			element:SetScript('OnUpdate', element.OnUpdate or onUpdate)
 		end
+		element:SetScript('OnUpdate', element.OnUpdate or onUpdate)
 
 		element.holdTime = 0
 
@@ -476,11 +475,10 @@ local function Enable(self, unit)
 		if (safeZone and safeZone:IsObjectType('Texture') and not safeZone:GetTexture()) then
 			safeZone:SetColorTexture(1, 0, 0)
 		end
-
-		element:Hide()
-
-		return true
 	end
+	element:Hide()
+
+	return true
 end
 
 local function Disable(self)
