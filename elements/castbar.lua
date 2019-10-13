@@ -455,6 +455,14 @@ local function Enable(self, unit)
 		if (self.unit == 'player' and not (self.hasChildren or self.isChild or self.isNamePlate)) then
 			CastingBarFrame_SetUnit(CastingBarFrame, nil)
 			CastingBarFrame_SetUnit(PetCastingBarFrame, nil)
+
+			CastingBarFrame:UnregisterAllEvents()
+			CastingBarFrame.Show = CastingBarFrame.Hide
+			CastingBarFrame:Hide()
+
+			PetCastingBarFrame:UnregisterAllEvents()
+			PetCastingBarFrame.Show = PetCastingBarFrame.Hide
+			PetCastingBarFrame:Hide()
 		end
 
 		if (element:IsObjectType('StatusBar') and not element:GetStatusBarTexture()) then
