@@ -115,7 +115,9 @@ local function CastStart(self, event, unit)
 	end
 
 	local element = self.Castbar
-
+	if not element then
+		return
+	end
 	local name, _, texture, startTime, endTime, isTradeSkill, castID, notInterruptible, spellID = UnitCastingInfo(unit)
 	event = 'UNIT_SPELLCAST_START'
 	if (not name) then
@@ -484,7 +486,9 @@ local function Enable(self, unit)
 			safeZone:SetColorTexture(1, 0, 0)
 		end
 	end
-	element:Hide()
+	if element then
+		element:Hide()
+	end
 
 	return true
 end
